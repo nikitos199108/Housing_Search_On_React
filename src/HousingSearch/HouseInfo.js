@@ -1,5 +1,6 @@
 import React from 'react';
 import './AppStyles.css';
+import {NavLink} from "react-router-dom";
 
 
 class HouseInfo extends React.Component {
@@ -11,8 +12,8 @@ class HouseInfo extends React.Component {
     }
 
     addToFavourList() {
-        let id = this.props.id;
-        this.callBack(id);
+        let obj = this.props.needHouse;
+        this.callBack(obj);
     }
 
 
@@ -48,6 +49,9 @@ class HouseInfo extends React.Component {
                                                id="buttonAdd"
                                                onClick={this.addToFavourList.bind(this)}/>
                                     </div>
+                                    <NavLink to="/">
+                                        <input type="button" value="Back home"  className="inputs" id="myHouses"/>
+                                    </NavLink>
                                 </div> :
                                 <div className="emptyHouse">House not found...</div>
                         }

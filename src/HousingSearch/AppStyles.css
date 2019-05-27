@@ -28,7 +28,6 @@ body {
 #container_item:hover {
     box-shadow: 0 0 7px black;
     width: 71%;
-    height: 62px;
     transition: 0.2s;
 }
 #list {
@@ -78,8 +77,6 @@ body {
 .divStyle:hover {
     cursor: pointer;
     box-shadow: 0 0 20px dodgerblue;
-    width: 205px;
-
     transition: 0.2s;
 }
 .textStyle {
@@ -101,6 +98,20 @@ body {
     font-size: 30px;
 }
 .cityInfo.closed {
+    display: none;
+}
+.delHouse {
+    border-radius: 0px;
+    margin: 6px;
+    height: 25px;
+    transition: 0.2s;
+}
+.delHouse:hover {
+    cursor: pointer;
+    box-shadow: 0 0 10px dodgerblue;
+    transition: 0.2s;
+}
+.delHouse.closed {
     display: none;
 }
 .moreResultsButton.closed {

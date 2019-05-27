@@ -1,6 +1,7 @@
 import React from 'react';
 import './AppStyles.css';
 import House from "./House";
+import {NavLink} from "react-router-dom";
 
 
 class FavouritesHouses extends React.Component {
@@ -26,7 +27,9 @@ class FavouritesHouses extends React.Component {
                             {
                                 this.props.favourHouses.map((house,index) =>{
                                     return <House house={house}
-                                                  key={index}/>
+                                                  key={index}
+                                                  type={true}
+                                                  deleteElem={this.props.deleteElemHouse}/>
                                 })
                             }
                         </div>
@@ -34,6 +37,9 @@ class FavouritesHouses extends React.Component {
                             <input type="button" value="Clear" className="inputs" id="buttonClearMyHouses"
                                    onClick={this.clear.bind(this)}/>
                         </div>
+                        <NavLink to="/">
+                            <input type="button" value="Back home"  className="inputs" id="myHouses"/>
+                        </NavLink>
                     </div>
         );
     }

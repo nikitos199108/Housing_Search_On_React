@@ -6,94 +6,89 @@ import fetchJsonp from "fetch-jsonp";
 import HouseInfo from "./HouseInfo";
 import {BrowserRouter, Route} from "react-router-dom";
 import FavouritesHouses from "./FavouritesHouses";
-import {createStore} from "redux";
-import {houseReducer} from "./Redux/Reducers";
 import {
     addMoreHouses, addNewHousesList, addToFavourList,
     clearFavList,
-    createHousesList,
+    createHousesList, deleteElem,
     inputTextChange,
     pageNumberChange,
     showHousesList, showMoreInfo
 } from "./Redux/Actions";
+import {connect} from "react-redux";
 
 
 class MainPage extends React.Component {
 
-    constructor() {
-        super();
-
-        this.store = createStore(houseReducer);
-        let state = this.store.getState();
-        this.state = state;
-
-        this.store.subscribe(() => {
-            let state = this.store.getState();
-            this.setState(state);
-        });
-
-    }
-
-    searchInputTextChange(input) {
-        this.store.dispatch(inputTextChange(input));
-    }
-
     didMountAddRequest() {
-        let page = this.state.pageNumber;
+        let page = this.props.pageNumber;
         ++page;
 
         this.addMoreHouses('https://api.nestoria.co.uk/api?encoding=json&pretty=1&action=search_listings&country=uk&listing_type=rent&place_name='
-            + this.state.inputText + '&number_of_results=10&page=' + page);
+            + this.props.inputText + '&number_of_results=10&page=' + page);
 
-        this.store.dispatch(pageNumberChange(page));
+        this.props.pageNumberChangeDispatch(page);
     }
 
     addMoreHouses(url) {
         fetchJsonp(url)
             .then((response)=> response.json())
             .then((obj) => obj.response.listings)
-            .then((moreHousesArray) => this.store.dispatch(addMoreHouses(moreHousesArray)))
+            .then((moreHousesArray) => this.props.addMoreList(moreHousesArray))
             .then(() => this.addNewHousesList());
     }
 
     addNewHousesList() {
-        let moreList = [...this.state.moreHousesArray];
-        let fullList = [...this.state.housesArray];
+        let moreList = [...this.props.moreHousesArray];
+        let fullList = [...this.props.housesArray];
         for (let i = 0; i < moreList.length; i++){
             fullList.push(moreList[i])
         }
-        this.store.dispatch(addNewHousesList(fullList));
+        for(let i = 0; i < fullList.length; i++) {
+            fullList[i].id = i;
+        }
+
+        this.props.addNewHousesListDispatch(fullList);
     }
 
     showMoreInfo(id) {
-        let arr = [...this.state.housesArray];
+        let arr = [...this.props.housesArray];
         for (let i = 0; i < arr.length; i++){
-            if (i === +id) {
+            if (arr[i].id === +id) {
                 let elem = arr[i];
-                this.store.dispatch(showMoreInfo(elem, id));
+                this.props.showMoreInfoDispatch(elem, id);
             }
         }
     }
 
-    addToFavourList(id) {
-        let arr = [...this.state.housesArray];
-        let favourArr = [...this.state.favourHouses];
-        for (let i = 0; i < arr.length; i++){
-            if (i === +id) {
-                favourArr.push(arr[i]);
+    addToFavourList(obj) {
+        let include = false;
+        let favourArr = [...this.props.favourHouses];
+
+        if (favourArr.length === 0) {
+            favourArr.push(obj);
+            this.props.addToFavourListDispatch(favourArr);
+        } else {
+            if (favourArr.length !== 0) {
+                for (let i = 0; i < favourArr.length; i++) {
+                    if (favourArr[i].id === obj.id) {
+                        include = true;
+                    }
+                }
+                if (include === true) {
+
+                } else {
+                    favourArr.push(obj);
+                    this.props.addToFavourListDispatch(favourArr);
+                }
             }
         }
-        this.store.dispatch(addToFavourList(favourArr));
-    }
 
-    clearFavourList() {
-        this.store.dispatch(clearFavList());
     }
 
     didMount() {
-        if(this.state.searchInputText !== "") {
+        if(this.props.searchInputText !== "") {
             this.searchHousesInTown('https://api.nestoria.co.uk/api?encoding=json&pretty=1&action=search_listings&country=uk&listing_type=rent&place_name='
-                + this.state.searchInputText + '&number_of_results=10&page=1');
+                + this.props.searchInputText + '&number_of_results=10&page=1');
         }
     }
 
@@ -102,15 +97,28 @@ class MainPage extends React.Component {
         fetchJsonp(url)
             .then((response)=> response.json())
             .then((obj) => obj.response.listings)
-            .then((housesList) => this.store.dispatch(createHousesList(housesList)))
+            .then((housesList) => this.props.addList(housesList))
             .then(() => this.createHousesList());
 
     }
 
     createHousesList() {
-        let inputText = this.state.searchInputText;
-        let arrList = [...this.state.housesList];
-        this.store.dispatch(showHousesList(inputText, arrList));
+        let inputText = this.props.searchInputText;
+        let arrList = [...this.props.housesList];
+        for(let i = 0; i < arrList.length; i++) {
+            arrList[i].id = i;
+        }
+
+        this.props.showHousesListDispatch(inputText, arrList);
+
+    }
+
+    deleteHouse(id) {
+        let favourArr = [...this.props.favourHouses];
+        let sortFavourArr = favourArr.filter(function(elem) {
+            return elem.id !== +id;
+        });
+        this.props.deleteElemDispatch(sortFavourArr);
     }
 
     render() {
@@ -118,23 +126,26 @@ class MainPage extends React.Component {
         return (
             <BrowserRouter>
                 <div>
-                    <SearchingPanel onInput={this.searchInputTextChange.bind(this)}
+                    <SearchingPanel onInput={this.props.searchInputTextChange}
                                     onDidMount={this.didMount.bind(this)}
-                                    searchInputText={this.state.searchInputText}
-                                    count={this.state.count}/>
+                                    searchInputText={this.props.searchInputText}
+                                    count={this.props.count}/>
                     <Route exact path="/" render={()=><HousesList
-                        housesList={this.state.housesArray}
-                        arrayBuild={this.state.arrayBuild}
-                        inputText={this.state.inputText}
+                        housesList={this.props.housesArray}
+                        arrayBuild={this.props.arrayBuild}
+                        inputText={this.props.inputText}
+                        deleteElemHouse={this.props.deleteHouse}
                         mountRequest={this.didMountAddRequest.bind(this)}
                         showMoreInfo={this.showMoreInfo.bind(this)}/>} />
                     <Route exact path="/houseinfo" render={()=><HouseInfo
-                        needHouse={this.state.needHouse}
-                        id={this.state.elemId}
+                        needHouse={this.props.needHouse}
+                        id={this.props.elemId}
+                        include={this.props.include}
                         addToFavour={this.addToFavourList.bind(this)}/>}/>
                     <Route exact path="/favourlist" render={()=><FavouritesHouses
-                        favourHouses={this.state.favourHouses}
-                        clearFavour={this.clearFavourList.bind(this)}/>}/>
+                        favourHouses={this.props.favourHouses}
+                        deleteElemHouse={this.deleteHouse.bind(this)}
+                        clearFavour={this.props.clearFavourList}/>}/>
                 </div>
             </BrowserRouter>
         );
@@ -143,4 +154,62 @@ class MainPage extends React.Component {
 
 }
 
-export default MainPage;
+let mapStateToProps = (state) => {
+    return {
+
+        housesArray: state.housesArray,
+        housesList: state.housesList,
+        moreHousesArray: state.moreHousesArray,
+        favourHouses: state.favourHouses,
+        arrayBuild: state.arrayBuild,
+        pageNumber: state.pageNumber,
+        inputText: state.inputText,
+        searchInputText: state.searchInputText,
+        elemId: state.elemId,
+        id: state.id,
+        needHouse: state.needHouse,
+        count: state.count,
+        include: state.include,
+    }
+};
+
+let mapDispatchToProps = (dispatch) => {
+   return {
+       searchInputTextChange: (input) => {
+           dispatch(inputTextChange(input));
+       },
+       addList: (housesList) => {
+           dispatch(createHousesList(housesList));
+       },
+       addMoreList: (moreHousesArray) => {
+           dispatch(addMoreHouses(moreHousesArray));
+       },
+       pageNumberChangeDispatch: (page) => {
+           dispatch(pageNumberChange(page));
+       },
+       showHousesListDispatch: (inputText, arrList) => {
+           dispatch(showHousesList(inputText, arrList));
+       },
+       addNewHousesListDispatch: (fullList) => {
+           dispatch(addNewHousesList(fullList));
+       },
+       clearFavourList: () => {
+           dispatch(clearFavList());
+       },
+       showMoreInfoDispatch: (elem, id) => {
+           dispatch(showMoreInfo(elem, id));
+       },
+       addToFavourListDispatch: (favourArr) => {
+           dispatch(addToFavourList(favourArr));
+       },
+       deleteElemDispatch: (sortFavourArr) => {
+           dispatch(deleteElem(sortFavourArr));
+       },
+
+   }
+};
+
+
+let connectFunc = connect(mapStateToProps, mapDispatchToProps)(MainPage);
+
+export default connectFunc;

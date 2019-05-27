@@ -15,6 +15,12 @@ export function houseReducer(oldState, action) {
                 moreHousesArray: [...action.moreHousesArray],
             };
 
+        case a.DELETE_HOUSE:
+            return {
+                ...oldState,
+                favourHouses: [...action.favourArr],
+            };
+
         case a.ADD_TO_FAVOUR:
             return {
                 ...oldState,
@@ -77,8 +83,10 @@ export function houseReducer(oldState, action) {
                 inputText: "",
                 searchInputText: "",
                 elemId: 0,
+                id: 0,
                 needHouse: {},
                 count: 0,
+                include: false,
             };
 
     }

@@ -8,6 +8,14 @@ export const a = {
     ADD_NEW_LIST: "ADD_NEW_LIST",
     SHOW_MORE_INFO: "SHOW_MORE_INFO",
     ADD_TO_FAVOUR: "ADD_TO_FAVOUR",
+    DELETE_HOUSE: "DELETE_HOUSE",
+};
+
+export const  deleteElem = (sortFavourArr) => {
+    return {
+        type: a.DELETE_HOUSE,
+        favourArr: sortFavourArr,
+    }
 };
 
 export const  createHousesList = (housesList) => {
