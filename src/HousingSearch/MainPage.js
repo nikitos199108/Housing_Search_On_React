@@ -51,7 +51,7 @@ class MainPage extends React.Component {
     }
 
     showMoreInfo(id) {
-        let arr = [...this.props.housesArray];
+        let arr = [...this.props.housesList];
         for (let i = 0; i < arr.length; i++){
             if (arr[i].id === +id) {
                 let elem = arr[i];
@@ -127,20 +127,12 @@ class MainPage extends React.Component {
             <BrowserRouter>
                 <div>
                     <SearchingPanel onInput={this.props.searchInputTextChange}
-                                    onDidMount={this.didMount.bind(this)}
-                                    searchInputText={this.props.searchInputText}
-                                    count={this.props.count}/>
+                                    onDidMount={this.didMount.bind(this)}/>
                     <Route exact path="/" render={()=><HousesList
-                        housesList={this.props.housesArray}
-                        arrayBuild={this.props.arrayBuild}
-                        inputText={this.props.inputText}
                         deleteElemHouse={this.props.deleteHouse}
                         mountRequest={this.didMountAddRequest.bind(this)}
                         showMoreInfo={this.showMoreInfo.bind(this)}/>} />
                     <Route exact path="/houseinfo" render={()=><HouseInfo
-                        needHouse={this.props.needHouse}
-                        id={this.props.elemId}
-                        include={this.props.include}
                         addToFavour={this.addToFavourList.bind(this)}/>}/>
                     <Route exact path="/favourlist" render={()=><FavouritesHouses
                         favourHouses={this.props.favourHouses}
@@ -161,14 +153,10 @@ let mapStateToProps = (state) => {
         housesList: state.housesList,
         moreHousesArray: state.moreHousesArray,
         favourHouses: state.favourHouses,
-        arrayBuild: state.arrayBuild,
         pageNumber: state.pageNumber,
-        inputText: state.inputText,
         searchInputText: state.searchInputText,
         elemId: state.elemId,
         id: state.id,
-        needHouse: state.needHouse,
-        count: state.count,
         include: state.include,
     }
 };

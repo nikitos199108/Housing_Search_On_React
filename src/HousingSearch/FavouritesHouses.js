@@ -2,6 +2,7 @@ import React from 'react';
 import './AppStyles.css';
 import House from "./House";
 import {NavLink} from "react-router-dom";
+import {connect} from "react-redux";
 
 
 class FavouritesHouses extends React.Component {
@@ -47,4 +48,14 @@ class FavouritesHouses extends React.Component {
 
 }
 
-export default FavouritesHouses;
+let mapStateToProps = (state) => {
+    return {
+
+        favourHouses: state.favourHouses,
+
+    }
+};
+
+let connectFavour = connect(mapStateToProps)(FavouritesHouses);
+
+export default connectFavour;

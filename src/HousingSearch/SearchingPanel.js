@@ -1,6 +1,7 @@
 import React from 'react';
 import './AppStyles.css';
 import {NavLink} from "react-router-dom";
+import {connect} from "react-redux";
 
 class SearchingPanel extends React.Component {
 
@@ -49,4 +50,14 @@ class SearchingPanel extends React.Component {
 
 }
 
-export default SearchingPanel;
+let mapStateToProps = (state) => {
+    return {
+
+        searchInputText: state.searchInputText,
+        count: state.count,
+    }
+};
+
+let connectSearchingPanel = connect(mapStateToProps)(SearchingPanel);
+
+export default connectSearchingPanel;

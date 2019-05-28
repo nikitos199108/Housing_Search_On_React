@@ -1,6 +1,7 @@
 import React from 'react';
 import './AppStyles.css';
 import {NavLink} from "react-router-dom";
+import {connect} from "react-redux";
 
 
 class HouseInfo extends React.Component {
@@ -63,5 +64,14 @@ class HouseInfo extends React.Component {
 
 }
 
+let mapStateToProps = (state) => {
+    return {
 
-export default HouseInfo;
+        needHouse: state.needHouse,
+    }
+};
+
+let connectHouseInfo = connect(mapStateToProps)(HouseInfo);
+
+
+export default connectHouseInfo;

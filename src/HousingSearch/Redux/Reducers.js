@@ -38,7 +38,7 @@ export function houseReducer(oldState, action) {
         case a.ADD_NEW_LIST:
             return {
                 ...oldState,
-                housesArray: [...action.housesArray],
+                housesList: [...action.housesArray],
             };
 
         case a.INPUT_TEXT_CHANGE:

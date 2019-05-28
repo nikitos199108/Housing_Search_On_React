@@ -2,6 +2,7 @@ import React from 'react';
 import './AppStyles.css';
 import House from "./House";
 import {NavLink} from "react-router-dom";
+import {connect} from "react-redux";
 
 
 class HousesList extends React.Component {
@@ -44,4 +45,14 @@ class HousesList extends React.Component {
 
 }
 
-export default HousesList;
+let mapStateToProps = (state) => {
+    return {
+        housesList: state.housesList,
+        arrayBuild: state.arrayBuild,
+        inputText: state.inputText,
+    }
+};
+
+let connectHList = connect(mapStateToProps)(HousesList);
+
+export default connectHList;
