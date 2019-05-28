@@ -27,9 +27,7 @@ class HousesList extends React.Component {
                         this.props.housesList.map((house, index) => {
                             return <House house={house}
                                           key={index}
-                                          type={false}
-                                          deleteElem={this.props.deleteElemHouse}
-                                          showMore={this.props.showMoreInfo}/>
+                                          type={false}/>
                         })
                     }
                 </NavLink>

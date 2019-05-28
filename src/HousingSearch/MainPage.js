@@ -7,12 +7,11 @@ import HouseInfo from "./HouseInfo";
 import {BrowserRouter, Route} from "react-router-dom";
 import FavouritesHouses from "./FavouritesHouses";
 import {
-    addMoreHouses, addNewHousesList, addToFavourList,
-    clearFavList,
-    createHousesList, deleteElem,
+    addMoreHouses, addNewHousesList,
+    createHousesList,
     inputTextChange,
     pageNumberChange,
-    showHousesList, showMoreInfo
+    showHousesList,
 } from "./Redux/Actions";
 import {connect} from "react-redux";
 
@@ -50,41 +49,6 @@ class MainPage extends React.Component {
         this.props.addNewHousesListDispatch(fullList);
     }
 
-    showMoreInfo(id) {
-        let arr = [...this.props.housesList];
-        for (let i = 0; i < arr.length; i++){
-            if (arr[i].id === +id) {
-                let elem = arr[i];
-                this.props.showMoreInfoDispatch(elem, id);
-            }
-        }
-    }
-
-    addToFavourList(obj) {
-        let include = false;
-        let favourArr = [...this.props.favourHouses];
-
-        if (favourArr.length === 0) {
-            favourArr.push(obj);
-            this.props.addToFavourListDispatch(favourArr);
-        } else {
-            if (favourArr.length !== 0) {
-                for (let i = 0; i < favourArr.length; i++) {
-                    if (favourArr[i].id === obj.id) {
-                        include = true;
-                    }
-                }
-                if (include === true) {
-
-                } else {
-                    favourArr.push(obj);
-                    this.props.addToFavourListDispatch(favourArr);
-                }
-            }
-        }
-
-    }
-
     didMount() {
         if(this.props.searchInputText !== "") {
             this.searchHousesInTown('https://api.nestoria.co.uk/api?encoding=json&pretty=1&action=search_listings&country=uk&listing_type=rent&place_name='
@@ -113,13 +77,6 @@ class MainPage extends React.Component {
 
     }
 
-    deleteHouse(id) {
-        let favourArr = [...this.props.favourHouses];
-        let sortFavourArr = favourArr.filter(function(elem) {
-            return elem.id !== +id;
-        });
-        this.props.deleteElemDispatch(sortFavourArr);
-    }
 
     render() {
 
@@ -129,15 +86,9 @@ class MainPage extends React.Component {
                     <SearchingPanel onInput={this.props.searchInputTextChange}
                                     onDidMount={this.didMount.bind(this)}/>
                     <Route exact path="/" render={()=><HousesList
-                        deleteElemHouse={this.props.deleteHouse}
-                        mountRequest={this.didMountAddRequest.bind(this)}
-                        showMoreInfo={this.showMoreInfo.bind(this)}/>} />
-                    <Route exact path="/houseinfo" render={()=><HouseInfo
-                        addToFavour={this.addToFavourList.bind(this)}/>}/>
-                    <Route exact path="/favourlist" render={()=><FavouritesHouses
-                        favourHouses={this.props.favourHouses}
-                        deleteElemHouse={this.deleteHouse.bind(this)}
-                        clearFavour={this.props.clearFavourList}/>}/>
+                        mountRequest={this.didMountAddRequest.bind(this)}/>} />
+                    <Route exact path="/houseinfo" render={()=><HouseInfo/>}/>
+                    <Route exact path="/favourlist" render={()=><FavouritesHouses/>}/>
                 </div>
             </BrowserRouter>
         );
@@ -152,12 +103,10 @@ let mapStateToProps = (state) => {
         housesArray: state.housesArray,
         housesList: state.housesList,
         moreHousesArray: state.moreHousesArray,
-        favourHouses: state.favourHouses,
         pageNumber: state.pageNumber,
         searchInputText: state.searchInputText,
-        elemId: state.elemId,
         id: state.id,
-        include: state.include,
+        inputText: state.inputText,
     }
 };
 
@@ -180,18 +129,6 @@ let mapDispatchToProps = (dispatch) => {
        },
        addNewHousesListDispatch: (fullList) => {
            dispatch(addNewHousesList(fullList));
-       },
-       clearFavourList: () => {
-           dispatch(clearFavList());
-       },
-       showMoreInfoDispatch: (elem, id) => {
-           dispatch(showMoreInfo(elem, id));
-       },
-       addToFavourListDispatch: (favourArr) => {
-           dispatch(addToFavourList(favourArr));
-       },
-       deleteElemDispatch: (sortFavourArr) => {
-           dispatch(deleteElem(sortFavourArr));
        },
 
    }

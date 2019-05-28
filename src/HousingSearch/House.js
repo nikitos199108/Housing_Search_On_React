@@ -1,5 +1,7 @@
 import React from 'react';
 import './AppStyles.css';
+import {deleteElem, showMoreInfo} from "./Redux/Actions";
+import {connect} from "react-redux";
 
 
 class House extends React.Component {
@@ -7,8 +9,6 @@ class House extends React.Component {
     constructor(props) {
         super(props);
 
-        this.callBack = props.showMore;
-        this.deletCallBack = props.deleteElem;
         this.elementId = React.createRef();
         this.delId = React.createRef();
     }
@@ -16,15 +16,24 @@ class House extends React.Component {
     showMoreInfo() {
         if (this.props.house.id >= 0 && (!this.props.type)) {
             let id = this.elementId.current.id;
-            this.callBack(id);
+            let arr = [...this.props.housesList];
+            for (let i = 0; i < arr.length; i++){
+                if (arr[i].id === +id) {
+                    let elem = arr[i];
+                    this.props.showMoreInfoDispatch(elem, id);
+                }
+            }
         }
     }
 
-    delFromFavourList() {
+    deleteHouse() {
         let id = this.delId.current.id;
-        this.deletCallBack(id);
+        let favourArr = [...this.props.favourHouses];
+        let sortFavourArr = favourArr.filter(function(elem) {
+            return elem.id !== +id;
+        });
+        this.props.deleteElemDispatch(sortFavourArr);
     }
-
 
     render() {
         return (
@@ -35,7 +44,7 @@ class House extends React.Component {
                 <span className="textStyle" id={this.props.house.id}>Price: {this.props.house.price_formatted} </span>
                 <input type="button" value="Delete" id={this.props.house.id} ref={this.delId}
                        className={this.props.type ? 'delHouse' : 'delHouse closed'}
-                       onClick={this.delFromFavourList.bind(this)}/>
+                       onClick={this.deleteHouse.bind(this)}/>
             </div>
         );
     }
@@ -43,4 +52,28 @@ class House extends React.Component {
 
 }
 
-export default House;
+let mapStateToProps = (state) => {
+    return {
+
+        favourHouses: state.favourHouses,
+        housesList: state.housesList,
+        elemId: state.elemId,
+    }
+};
+
+let mapDispatchToProps = (dispatch) => {
+    return {
+
+        deleteElemDispatch: (sortFavourArr) => {
+            dispatch(deleteElem(sortFavourArr));
+        },
+        showMoreInfoDispatch: (elem, id) => {
+            dispatch(showMoreInfo(elem, id));
+        },
+
+    }
+};
+
+let connectHouse = connect(mapStateToProps,mapDispatchToProps)(House);
+
+export default connectHouse;
